@@ -11,7 +11,7 @@ import java.time.Instant;
 @Entity
 @Table(name = "post")
 @Builder
-@Getter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @SQLDelete(sql = "updated \"post\" set deleted_at = now() where id = ?")

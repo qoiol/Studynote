@@ -2,7 +2,6 @@ package com.example.postservice.service;
 
 import com.example.postservice.domain.Post;
 import com.example.postservice.domain.User;
-import com.example.postservice.dto.response.PostCreateResponse;
 import com.example.postservice.exception.ErrorCode;
 import com.example.postservice.exception.PostApplicationException;
 import com.example.postservice.repository.PostRepository;
@@ -22,12 +21,24 @@ public class PostService {
 
     @Transactional
     public void create(String title, String content, String userId) {
-        System.out.println("userid = "+userId);
         // user 검증
         User user = userRepository.findById(userId).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND));
-        System.out.println("userid = "+user.getId());
         //등록
         postRepository.save(Post.builder().title(title).content(content).user(user).build());
+    }
+
+    public void update(Long id, String title, String content, String name) {
+        //user 검증
+        User user = userRepository.findById(name).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND));
+        //post 검증
+        Post post = postRepository.findById(id).orElseThrow(() -> new PostApplicationException(ErrorCode.POST_NOT_FOUND));
+        if(post.getUser() != user) throw new PostApplicationException(ErrorCode.INVALID_PERMISSION);
+
+        post.setTitle(title);
+        post.setContent(content);
+
+        //update
+        postRepository.save(post);
     }
 
 //    @Transactional

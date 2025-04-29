@@ -2,16 +2,14 @@ package com.example.postservice.controller;
 
 
 import com.example.postservice.dto.request.PostCreateRequest;
+import com.example.postservice.dto.request.PostUpdateRequest;
 import com.example.postservice.dto.response.PostCreateResponse;
 import com.example.postservice.dto.response.Response;
 import com.example.postservice.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Log4j2
 @RestController
@@ -25,6 +23,12 @@ public class PostController {
         postService.create(request.getTitle(), request.getContent(), authentication.getName());
 
 //        log.error("postcreate authentication {}, {}", authentication.getName(), authentication.getAuthorities());
+        return Response.success();
+    }
+
+    @PutMapping("/{id}")
+    public Response<Void> update(@RequestBody PostCreateRequest request, @PathVariable Long id, Authentication authentication) {
+        postService.update(id, request.getTitle(), request.getContent(), authentication.getName());
         return Response.success();
     }
 }
