@@ -14,7 +14,7 @@ import java.time.Instant;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@SQLDelete(sql = "updated \"post\" set deleted_at = now() where id = ?")
+@SQLDelete(sql = "update post set deleted_at = now() where id = ?")
 @SQLRestriction("deleted_at is null")
 public class Post {
     @Id

@@ -1,8 +1,11 @@
 package com.example.postservice.service;
 
 import com.example.postservice.domain.Post;
+import com.example.postservice.domain.User;
 import com.example.postservice.exception.ErrorCode;
 import com.example.postservice.exception.PostApplicationException;
+import com.example.postservice.fixture.PostFixture;
+import com.example.postservice.fixture.UserFixture;
 import com.example.postservice.repository.PostRepository;
 import com.example.postservice.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
@@ -42,4 +45,49 @@ public class PostServiceTest {
 
     }
 
+
+    @Test
+    void 포스트_삭제_실패() {
+        String userid = "user";
+        Long postid = 1L;
+
+        // 유저 정보 X
+        when(userRepository.findById(userid)).thenReturn(Optional.empty());
+
+        PostApplicationException e1 = Assertions.assertThrows(PostApplicationException.class, () -> postService.delete(postid, userid));
+        Assertions.assertEquals(e1.getErrorCode(), ErrorCode.USER_NOT_FOUND);
+
+        // post 정보 X
+        when(userRepository.findById(userid)).thenReturn(Optional.of(mock(User.class)));
+        when(postRepository.findById(any())).thenReturn(Optional.empty());
+
+        PostApplicationException e2 = Assertions.assertThrows(PostApplicationException.class, () -> postService.delete(postid, userid));
+        Assertions.assertEquals(e2.getErrorCode(), ErrorCode.POST_NOT_FOUND);
+
+        // post 작성자 불일치
+        User user1 = UserFixture.get("test", "1234");
+        User user2 = UserFixture.get("user", "1234");
+        Post post = PostFixture.get(postid, user1);
+
+        when(userRepository.findById(userid)).thenReturn(Optional.of(user2));
+        when(postRepository.findById(any())).thenReturn(Optional.of(post));
+
+        PostApplicationException e3 = Assertions.assertThrows(PostApplicationException.class, () -> postService.delete(postid, userid));
+        Assertions.assertEquals(e3.getErrorCode(), ErrorCode.INVALID_PERMISSION);
+    }
+
+    @Test
+    void 포스트_삭제_성공() {
+        String userid = "user";
+        Long postid = 1L;
+        // post 작성자 불일치
+        User user = UserFixture.get(userid, "1234");
+        Post post = PostFixture.get(postid, user);
+
+
+        when(userRepository.findById(userid)).thenReturn(Optional.of(user));
+        when(postRepository.findById(postid)).thenReturn(Optional.of(post));
+
+        Assertions.assertDoesNotThrow(() -> postService.delete(postid, userid));
+    }
 }

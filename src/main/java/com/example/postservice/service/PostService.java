@@ -41,14 +41,14 @@ public class PostService {
         postRepository.save(post);
     }
 
-//    @Transactional
-//    public PostCreateResponse create(String title, String content, String userId) {
-//        log.error("service {}", userId);
-//        // user 검증
-//        User user = userRepository.findById(userId).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND));
-//        //등록
-//        Post save = postRepository.save(Post.builder().title(title).content(content).user(user).build());
-//        return new PostCreateResponse(save.getTitle(), save.getContent(), save.getUser().getId());
-//    }
+    public void delete(Long id, String name) {
+        //user 검증
+        User user = userRepository.findById(name).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND));
+        //post 검증
+        Post post = postRepository.findById(id).orElseThrow(() -> new PostApplicationException(ErrorCode.POST_NOT_FOUND));
+        if(post.getUser() != user) throw new PostApplicationException(ErrorCode.INVALID_PERMISSION);
+
+        postRepository.deleteById(id);
+    }
 
 }
