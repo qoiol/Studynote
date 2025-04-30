@@ -2,12 +2,15 @@ package com.example.postservice.service;
 
 import com.example.postservice.domain.Post;
 import com.example.postservice.domain.User;
+import com.example.postservice.dto.PostDTO;
 import com.example.postservice.exception.ErrorCode;
 import com.example.postservice.exception.PostApplicationException;
 import com.example.postservice.repository.PostRepository;
 import com.example.postservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,4 +54,14 @@ public class PostService {
         postRepository.deleteById(id);
     }
 
+    public Page<PostDTO> list(Pageable pageable) {
+        return postRepository.findAll(pageable).map(PostDTO::fromPost);
+    }
+
+    public Page<PostDTO> my(Pageable pageable, String userId) {
+        // user 검증
+        User user = userRepository.findById(userId).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND));
+
+        return postRepository.findAllByUser(user, pageable).map(PostDTO::fromPost);
+    }
 }

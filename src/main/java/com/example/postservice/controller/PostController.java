@@ -1,13 +1,14 @@
 package com.example.postservice.controller;
 
 
+import com.example.postservice.dto.PostDTO;
 import com.example.postservice.dto.request.PostCreateRequest;
-import com.example.postservice.dto.request.PostUpdateRequest;
-import com.example.postservice.dto.response.PostCreateResponse;
 import com.example.postservice.dto.response.Response;
 import com.example.postservice.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,5 +37,15 @@ public class PostController {
     public Response<Void> delete(@PathVariable Long id, Authentication authentication) {
         postService.delete(id, authentication.getName());
         return Response.success();
+    }
+
+    @GetMapping
+    public Response<Page<PostDTO>> list(Pageable pageable, Authentication authentication) {
+        return Response.success(postService.list(pageable));
+    }
+
+    @GetMapping("/my")
+    public Response<Page<PostDTO>> my(Pageable pageable, Authentication authentication) {
+        return Response.success(postService.my(pageable, authentication.getName()));
     }
 }
