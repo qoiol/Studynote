@@ -40,7 +40,6 @@ public class AuthenticationConfig {
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(secretKey, userService), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(e -> {
-                    log.error("securityfilterchainexception");
                     e.authenticationEntryPoint(new CustomAuthenticationEntryPoint());
                 })
                 .build();

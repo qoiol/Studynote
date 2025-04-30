@@ -82,8 +82,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
-            log.info("인증 객체: {}", SecurityContextHolder.getContext().getAuthentication());
-
         } catch(RuntimeException e) {
             log.error("Error occurs while validating. {}", e.toString());
             filterChain.doFilter(request, response);

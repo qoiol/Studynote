@@ -11,10 +11,10 @@ import java.time.Instant;
 @Entity
 @Table(name = "post")
 @Builder
-@Getter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@SQLDelete(sql = "updated \"post\" set deleted_at = now() where id = ?")
+@SQLDelete(sql = "update post set deleted_at = now() where id = ?")
 @SQLRestriction("deleted_at is null")
 public class Post {
     @Id
