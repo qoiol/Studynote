@@ -1,6 +1,6 @@
 package com.example.postservice.exception;
 
-import com.example.postservice.dto.response.Response;
+import com.example.postservice.controller.response.Response;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,6 +14,7 @@ import java.io.IOException;
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+        log.error("unauthorized : {}", request.getRequestURI());
         response.setContentType("application/json");
         response.setStatus(ErrorCode.INVALID_TOKEN.getStatus().value());
         response.getWriter().write(Response.error(ErrorCode.INVALID_TOKEN.name()).toStream());

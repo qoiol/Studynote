@@ -1,7 +1,7 @@
 package com.example.postservice.fixture;
 
-import com.example.postservice.domain.Post;
-import com.example.postservice.domain.User;
+import com.example.postservice.model.entity.Post;
+import com.example.postservice.model.entity.User;
 
 public class PostFixture {
     public static Post get(Long postId, User user) {
