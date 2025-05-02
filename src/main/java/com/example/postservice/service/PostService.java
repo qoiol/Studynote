@@ -1,17 +1,13 @@
 package com.example.postservice.service;
 
-import com.example.postservice.model.entity.Comment;
-import com.example.postservice.model.entity.Like;
-import com.example.postservice.model.entity.Post;
-import com.example.postservice.model.entity.User;
+import com.example.postservice.model.AlarmArgs;
+import com.example.postservice.model.AlarmType;
+import com.example.postservice.model.entity.*;
 import com.example.postservice.model.dto.CommentDTO;
 import com.example.postservice.model.dto.PostDTO;
 import com.example.postservice.exception.ErrorCode;
 import com.example.postservice.exception.PostApplicationException;
-import com.example.postservice.repository.CommentRepository;
-import com.example.postservice.repository.LikeRepository;
-import com.example.postservice.repository.PostRepository;
-import com.example.postservice.repository.UserRepository;
+import com.example.postservice.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -28,6 +24,7 @@ public class PostService {
     private final UserRepository userRepository;
     private final LikeRepository likeRepository;
     private final CommentRepository commentRepository;
+    private final AlarmRepository alarmRepository;
 
     @Transactional
     public void create(String title, String content, String userId) {
@@ -44,7 +41,7 @@ public class PostService {
         //post 검증
         Post post = postRepository.findById(id).orElseThrow(() -> new PostApplicationException(ErrorCode.POST_NOT_FOUND));
         //post 작성자 검증
-        if(post.getUser() != user) throw new PostApplicationException(ErrorCode.INVALID_PERMISSION);
+        if (post.getUser() != user) throw new PostApplicationException(ErrorCode.INVALID_PERMISSION);
 
         post.setTitle(title);
         post.setContent(content);
@@ -60,7 +57,7 @@ public class PostService {
         //post 검증
         Post post = postRepository.findById(id).orElseThrow(() -> new PostApplicationException(ErrorCode.POST_NOT_FOUND));
         //post 작성자 검증
-        if(post.getUser() != user) throw new PostApplicationException(ErrorCode.INVALID_PERMISSION);
+        if (post.getUser() != user) throw new PostApplicationException(ErrorCode.INVALID_PERMISSION);
 
         postRepository.deleteById(id);
     }
@@ -88,6 +85,14 @@ public class PostService {
         });
         // 저장
         likeRepository.save(Like.builder().post(post).user(user).build());
+        // 알람 발생
+        alarmRepository.save(Alarm.builder()
+                .alarmType(AlarmType.NEW_LIKE_ON_POST)
+                .args(new AlarmArgs(user.getId(), post.getId()))
+                .user(post.getUser())
+                .build()
+        );
+
     }
 
     public Integer countLike(Long id) {
@@ -106,6 +111,13 @@ public class PostService {
         Post post = postRepository.findById(id).orElseThrow(() -> new PostApplicationException(ErrorCode.POST_NOT_FOUND));
         // 댓글 등록
         commentRepository.save(Comment.builder().comment(comment).user(user).post(post).build());
+        // 알람 발생
+        alarmRepository.save(Alarm.builder()
+                .alarmType(AlarmType.NEW_COMMENT_ON_POST)
+                .args(new AlarmArgs(user.getId(), post.getId()))
+                .user(post.getUser())
+                .build()
+        );
     }
 
     public Page<CommentDTO> commentList(Pageable pageable, Long id) {
