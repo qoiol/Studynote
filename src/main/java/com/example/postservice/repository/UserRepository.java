@@ -1,9 +1,8 @@
 package com.example.postservice.repository;
 
-import com.example.postservice.domain.User;
+import com.example.postservice.model.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.NativeQuery;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 

@@ -1,8 +1,8 @@
 package com.example.postservice.repository;
 
-import com.example.postservice.domain.Like;
-import com.example.postservice.domain.Post;
-import com.example.postservice.domain.User;
+import com.example.postservice.model.entity.Like;
+import com.example.postservice.model.entity.Post;
+import com.example.postservice.model.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

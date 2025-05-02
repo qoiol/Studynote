@@ -1,4 +1,4 @@
-package com.example.postservice.dto.request;
+package com.example.postservice.controller.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

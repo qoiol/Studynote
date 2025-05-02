@@ -1,4 +1,4 @@
-package com.example.postservice.domain;
+package com.example.postservice.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -9,24 +9,25 @@ import java.sql.Timestamp;
 import java.time.Instant;
 
 @Entity
-@Table(name = "likes")
-@Data
+@Table(name = "post")
 @Builder
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@SQLDelete(sql = "update likes set deleted_at=now() where id=?")
+@SQLDelete(sql = "update post set deleted_at = now() where id = ?")
 @SQLRestriction("deleted_at is null")
-public class Like {
+public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "id", unique = true, nullable = false)
     private Long id;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="post_id")
-    private Post post;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id")
     private User user;
+    @Column(name = "title", nullable = false, length = 200)
+    private String title;
+    @Column(name = "content", columnDefinition = "text not null")
+    private String content;
     @Column(name="registered_at")
     private Timestamp registeredAt;
     @Column(name="updated_at")
@@ -43,5 +44,4 @@ public class Like {
     public void updatedAt() {
         this.updatedAt = Timestamp.from(Instant.now());
     }
-
 }

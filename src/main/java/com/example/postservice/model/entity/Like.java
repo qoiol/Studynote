@@ -1,4 +1,4 @@
-package com.example.postservice.domain;
+package com.example.postservice.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,37 +8,40 @@ import org.hibernate.annotations.SQLRestriction;
 import java.sql.Timestamp;
 import java.time.Instant;
 
-@ToString
 @Entity
-@Table(name = "user")
+@Table(name = "likes")
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@SQLDelete(sql = "update user set deleted_at = now() where id=?")
+@SQLDelete(sql = "update likes set deleted_at=now() where id=?")
 @SQLRestriction("deleted_at is null")
-public class User {
+public class Like {
     @Id
-    @Column(name = "id", nullable = false, unique = true, length = 30)
-    private String id;
-    @Column(name = "password", nullable = false, length = 300)
-    private String password;
-    @Column(name = "role")
-    @Enumerated(EnumType.STRING)
-    private UserRole role = UserRole.USER;
-    @Column(name = "registered_at")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="post_id")
+    private Post post;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="user_id")
+    private User user;
+    @Column(name="registered_at")
     private Timestamp registeredAt;
-    @Column(name = "updated_at")
+    @Column(name="updated_at")
     private Timestamp updatedAt;
     @Column(name="deleted_at")
     private Timestamp deletedAt;
 
     @PrePersist
-    void registeredAt() {
+    public void registeredAt() {
         this.registeredAt = Timestamp.from(Instant.now());
     }
 
     @PreUpdate
-    void updatedAt() {
+    public void updatedAt() {
         this.updatedAt = Timestamp.from(Instant.now());
     }
+
 }

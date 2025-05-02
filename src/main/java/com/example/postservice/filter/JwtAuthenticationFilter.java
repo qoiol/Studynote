@@ -1,6 +1,6 @@
 package com.example.postservice.filter;
 
-import com.example.postservice.dto.UserDTO;
+import com.example.postservice.model.dto.UserDTO;
 import com.example.postservice.service.UserService;
 import com.example.postservice.util.JwtTokenUtils;
 import jakarta.servlet.FilterChain;
@@ -14,7 +14,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -23,7 +22,6 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 
 /**
