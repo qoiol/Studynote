@@ -7,6 +7,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class PostCreateResponse {
     private String title;
-    private String content;
-    private String userId;
+    private String body;
+    private String name;
 }

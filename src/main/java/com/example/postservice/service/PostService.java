@@ -1,10 +1,15 @@
 package com.example.postservice.service;
 
+import com.example.postservice.domain.Comment;
+import com.example.postservice.domain.Like;
 import com.example.postservice.domain.Post;
 import com.example.postservice.domain.User;
+import com.example.postservice.dto.CommentDTO;
 import com.example.postservice.dto.PostDTO;
 import com.example.postservice.exception.ErrorCode;
 import com.example.postservice.exception.PostApplicationException;
+import com.example.postservice.repository.CommentRepository;
+import com.example.postservice.repository.LikeRepository;
 import com.example.postservice.repository.PostRepository;
 import com.example.postservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +26,8 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final LikeRepository likeRepository;
+    private final CommentRepository commentRepository;
 
     @Transactional
     public void create(String title, String content, String userId) {
@@ -30,11 +37,13 @@ public class PostService {
         postRepository.save(Post.builder().title(title).content(content).user(user).build());
     }
 
+    @Transactional
     public void update(Long id, String title, String content, String name) {
         //user 검증
         User user = userRepository.findById(name).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND));
         //post 검증
         Post post = postRepository.findById(id).orElseThrow(() -> new PostApplicationException(ErrorCode.POST_NOT_FOUND));
+        //post 작성자 검증
         if(post.getUser() != user) throw new PostApplicationException(ErrorCode.INVALID_PERMISSION);
 
         post.setTitle(title);
@@ -44,11 +53,13 @@ public class PostService {
         postRepository.save(post);
     }
 
+    @Transactional
     public void delete(Long id, String name) {
         //user 검증
         User user = userRepository.findById(name).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND));
         //post 검증
         Post post = postRepository.findById(id).orElseThrow(() -> new PostApplicationException(ErrorCode.POST_NOT_FOUND));
+        //post 작성자 검증
         if(post.getUser() != user) throw new PostApplicationException(ErrorCode.INVALID_PERMISSION);
 
         postRepository.deleteById(id);
@@ -58,10 +69,50 @@ public class PostService {
         return postRepository.findAll(pageable).map(PostDTO::fromPost);
     }
 
+    @Transactional
     public Page<PostDTO> my(Pageable pageable, String userId) {
         // user 검증
         User user = userRepository.findById(userId).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND));
-
         return postRepository.findAllByUser(user, pageable).map(PostDTO::fromPost);
+    }
+
+    @Transactional
+    public void addLike(Long id, String name) {
+        // user 검증
+        User user = userRepository.findById(name).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND));
+        // post 검증
+        Post post = postRepository.findById(id).orElseThrow(() -> new PostApplicationException(ErrorCode.POST_NOT_FOUND));
+        // 좋아요 눌렀는지 검증
+        likeRepository.findByUserAndPost(user, post).ifPresent((it) -> {
+            throw new PostApplicationException(ErrorCode.ALREADY_LIKED, String.format("user %s already like post %d", name, id));
+        });
+        // 저장
+        likeRepository.save(Like.builder().post(post).user(user).build());
+    }
+
+    public Integer countLike(Long id) {
+        //post 검증
+        Post post = postRepository.findById(id).orElseThrow(() -> new PostApplicationException(ErrorCode.POST_NOT_FOUND));
+
+        //like 개수 가져오기
+        return likeRepository.countByPost(post);
+    }
+
+    @Transactional
+    public void addComment(Long id, String comment, String name) {
+        // user 검증
+        User user = userRepository.findById(name).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND));
+        // post 검증
+        Post post = postRepository.findById(id).orElseThrow(() -> new PostApplicationException(ErrorCode.POST_NOT_FOUND));
+        // 댓글 등록
+        commentRepository.save(Comment.builder().comment(comment).user(user).post(post).build());
+    }
+
+    public Page<CommentDTO> commentList(Pageable pageable, Long id) {
+        // post 검증
+        Post post = postRepository.findById(id).orElseThrow(() -> new PostApplicationException(ErrorCode.POST_NOT_FOUND));
+
+        //댓글 가져오기
+        return commentRepository.findAllByPost(pageable, post).map(CommentDTO::fromComment);
     }
 }

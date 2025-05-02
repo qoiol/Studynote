@@ -56,7 +56,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
         if(header == null || !header.startsWith("Bearer")) {
-            log.error("Error occurs while getting header. header is null or invalid");
+            log.error("Error occurs while getting header. header is null or invalid. request uri : {}", request.getRequestURI());
             filterChain.doFilter(request, response);
             return;
         }
