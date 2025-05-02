@@ -75,8 +75,6 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-
-
 node {
     nodeModulesDir = file("$projectDir/front-end")
     version = '18.3.0'
