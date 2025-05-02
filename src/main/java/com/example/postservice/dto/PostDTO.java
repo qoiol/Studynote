@@ -1,8 +1,6 @@
 package com.example.postservice.dto;
 
 import com.example.postservice.domain.Post;
-import com.example.postservice.domain.User;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +16,7 @@ public class PostDTO {
     private Long id;
     private PostUserDTO user;
     private String title;
-    private String content;
+    private String body;
     private Timestamp registeredAt;
     private Timestamp updatedAt;
     private Timestamp deletedAt;
@@ -28,7 +26,7 @@ public class PostDTO {
         postDTO.setId(post.getId());
         postDTO.setUser(PostUserDTO.fromUser(post.getUser()));
         postDTO.setTitle(post.getTitle());
-        postDTO.setContent(post.getContent());
+        postDTO.setBody(post.getContent());
         postDTO.setRegisteredAt(post.getRegisteredAt());
         postDTO.setUpdatedAt(post.getUpdatedAt());
         postDTO.setDeletedAt(post.getDeletedAt());

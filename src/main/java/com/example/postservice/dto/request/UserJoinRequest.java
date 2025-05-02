@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class UserJoinRequest {
     @NotBlank(message = "enter 4 to 20 characters")
     @Size(max = 20, min = 4, message = "enter 4 to 20 characters")
-    private String id;
+    private String name;
     @NotBlank(message = "enter 4 to 20 characters")
     @Size(max = 20, min = 4, message = "enter 4 to 20 characters")
     private String password;

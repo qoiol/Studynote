@@ -18,18 +18,18 @@ import org.springframework.web.bind.annotation.*;
 @Log4j2
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/user")
+@RequestMapping("/api/v1/users")
 public class UserController {
     private final UserService userService;
 
     @PostMapping("/join")
     public Response<UserJoinResponse> join(@RequestBody @Valid UserJoinRequest request) {
-        return Response.success(userService.join(request.getId(), request.getPassword()));
+        return Response.success(userService.join(request.getName(), request.getPassword()));
     }
 
     @PostMapping("/login")
     public Response<LoginResponse> login(@RequestBody LoginRequest request, HttpServletResponse response) {
-        LoginResponse loginInfo = userService.login(request.getId(), request.getPassword());
+        LoginResponse loginInfo = userService.login(request.getName(), request.getPassword());
 //        JwtTokenUtils.addCookie("access-token", loginInfo.getToken(), response);
         log.info("login info : {}", loginInfo.toString());
         return Response.success(loginInfo);
