@@ -1,11 +1,11 @@
 package com.example.postservice.service;
 
-import com.example.postservice.domain.Comment;
-import com.example.postservice.domain.Like;
-import com.example.postservice.domain.Post;
-import com.example.postservice.domain.User;
-import com.example.postservice.dto.CommentDTO;
-import com.example.postservice.dto.PostDTO;
+import com.example.postservice.model.entity.Comment;
+import com.example.postservice.model.entity.Like;
+import com.example.postservice.model.entity.Post;
+import com.example.postservice.model.entity.User;
+import com.example.postservice.model.dto.CommentDTO;
+import com.example.postservice.model.dto.PostDTO;
 import com.example.postservice.exception.ErrorCode;
 import com.example.postservice.exception.PostApplicationException;
 import com.example.postservice.repository.CommentRepository;

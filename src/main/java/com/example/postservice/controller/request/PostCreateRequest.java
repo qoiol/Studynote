@@ -1,12 +1,11 @@
-package com.example.postservice.dto.response;
+package com.example.postservice.controller.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class PostCreateResponse {
+public class PostCreateRequest {
     private String title;
     private String body;
-    private String name;
 }

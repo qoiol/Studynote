@@ -1,4 +1,4 @@
-package com.example.postservice.domain;
+package com.example.postservice.model;
 
 public enum UserRole {
     ADMIN,

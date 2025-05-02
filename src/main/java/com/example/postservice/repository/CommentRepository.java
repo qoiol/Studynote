@@ -1,7 +1,7 @@
 package com.example.postservice.repository;
 
-import com.example.postservice.domain.Comment;
-import com.example.postservice.domain.Post;
+import com.example.postservice.model.entity.Comment;
+import com.example.postservice.model.entity.Post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

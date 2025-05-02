@@ -1,7 +1,7 @@
-package com.example.postservice.dto;
+package com.example.postservice.model.dto;
 
-import com.example.postservice.domain.User;
-import com.example.postservice.domain.UserRole;
+import com.example.postservice.model.entity.User;
+import com.example.postservice.model.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

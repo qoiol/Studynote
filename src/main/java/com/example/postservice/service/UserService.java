@@ -1,18 +1,22 @@
 package com.example.postservice.service;
 
-import com.example.postservice.domain.User;
-import com.example.postservice.dto.UserDTO;
-import com.example.postservice.dto.response.UserDeleteResponse;
-import com.example.postservice.dto.response.UserInfoResponse;
-import com.example.postservice.dto.response.UserJoinResponse;
-import com.example.postservice.dto.response.LoginResponse;
+import com.example.postservice.model.entity.User;
+import com.example.postservice.model.dto.AlarmDTO;
+import com.example.postservice.model.dto.UserDTO;
+import com.example.postservice.controller.response.UserDeleteResponse;
+import com.example.postservice.controller.response.UserInfoResponse;
+import com.example.postservice.controller.response.UserJoinResponse;
+import com.example.postservice.controller.response.LoginResponse;
 import com.example.postservice.exception.ErrorCode;
 import com.example.postservice.exception.PostApplicationException;
+import com.example.postservice.repository.AlarmRepository;
 import com.example.postservice.repository.UserRepository;
 import com.example.postservice.util.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final AlarmRepository alarmRepository;
     private final BCryptPasswordEncoder encoder;
 
     @Value("${jwt.secret-key}")
@@ -83,5 +88,10 @@ public class UserService {
 
         userRepository.deleteUserFromDB(id);
         return new UserDeleteResponse(id);
+    }
+
+    public Page<AlarmDTO> alarmList(Pageable pageable, String name) {
+        User user = userRepository.findById(name).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND, String.format("user %s not found", name)));
+        return alarmRepository.findByUser(pageable, user).map(AlarmDTO::fromAlarm);
     }
 }

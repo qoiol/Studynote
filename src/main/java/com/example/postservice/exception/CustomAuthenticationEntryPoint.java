@@ -1,6 +1,6 @@
 package com.example.postservice.exception;
 
-import com.example.postservice.dto.response.Response;
+import com.example.postservice.controller.response.Response;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

@@ -1,13 +1,14 @@
 package com.example.postservice.controller;
 
 
-import com.example.postservice.dto.CommentDTO;
-import com.example.postservice.dto.PostDTO;
-import com.example.postservice.dto.request.CommentRegistRequest;
-import com.example.postservice.dto.request.PostCreateRequest;
-import com.example.postservice.dto.response.Response;
+import com.example.postservice.controller.response.CommentResponse;
+import com.example.postservice.controller.response.PostResponse;
+import com.example.postservice.model.dto.CommentDTO;
+import com.example.postservice.model.dto.PostDTO;
+import com.example.postservice.controller.request.CommentRegistRequest;
+import com.example.postservice.controller.request.PostCreateRequest;
+import com.example.postservice.controller.response.Response;
 import com.example.postservice.service.PostService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -43,13 +44,13 @@ public class PostController {
     }
 
     @GetMapping
-    public Response<Page<PostDTO>> list(Pageable pageable, Authentication authentication) {
-        return Response.success(postService.list(pageable));
+    public Response<Page<PostResponse>> list(Pageable pageable, Authentication authentication) {
+        return Response.success(postService.list(pageable).map(PostResponse::fromPost));
     }
 
     @GetMapping("/my")
-    public Response<Page<PostDTO>> my(Pageable pageable, Authentication authentication) {
-        return Response.success(postService.my(pageable, authentication.getName()));
+    public Response<Page<PostResponse>> my(Pageable pageable, Authentication authentication) {
+        return Response.success(postService.my(pageable, authentication.getName()).map(PostResponse::fromPost));
     }
 
     @GetMapping("/{id}/likes")
@@ -64,8 +65,8 @@ public class PostController {
     }
 
     @GetMapping("/{id}/comments")
-    public Response<Page<CommentDTO>> comment(Pageable pageable, @PathVariable Long id) {
-        return Response.success(postService.commentList(pageable, id));
+    public Response<Page<CommentResponse>> comment(Pageable pageable, @PathVariable Long id) {
+        return Response.success(postService.commentList(pageable, id).map(CommentResponse::fromComment));
     }
 
     @PostMapping("/{id}/comments")
