@@ -48,7 +48,7 @@ public class UserController {
     public Response<Page<AlarmResponse>> alarm(Pageable pageable, Authentication authentication) {
         UserDTO user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), UserDTO.class)
                 .orElseThrow(() -> new PostApplicationException(ErrorCode.INTERNAL_SERVER_ERROR, "Casting to User class failed"));
-        return Response.success(userService.alarmList(pageable, user.getUsername()).map(AlarmResponse::fromAlarmDTO));
+        return Response.success(userService.alarmList(pageable, user.getId()).map(AlarmResponse::fromAlarmDTO));
     }
 
 }

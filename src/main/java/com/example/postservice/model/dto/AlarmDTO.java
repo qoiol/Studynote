@@ -16,7 +16,7 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 public class AlarmDTO {
     private Long id;
-    private UserDTO user;
+//    private UserDTO user;
     private AlarmType alarmType;
     private AlarmArgs alarmArgs;
     private Timestamp registeredAt;
@@ -26,7 +26,7 @@ public class AlarmDTO {
     public static AlarmDTO fromAlarm(Alarm alarm) {
         return AlarmDTO.builder()
                 .id(alarm.getId())
-                .user(UserDTO.fromUser(alarm.getUser()))
+//                .user(UserDTO.fromUser(alarm.getUser()))
                 .alarmType(alarm.getAlarmType())
                 .alarmArgs(alarm.getArgs())
                 .registeredAt(alarm.getRegisteredAt())
