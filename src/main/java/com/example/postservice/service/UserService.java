@@ -34,29 +34,29 @@ public class UserService {
     @Value("${jwt.expired-time-ms}")
     private long expiredTimeMs;
 
-    public UserDTO loadUserById(String id) {
-        return userRepository.findById(id).map(UserDTO::fromUser).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s is not found", id)));
+    public UserDTO loadUserById(String username) {
+        return userRepository.findByUsername(username).map(UserDTO::fromUser).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s is not found", username)));
     }
 
     @Transactional
-    public UserJoinResponse join(String id, String password) {
+    public UserJoinResponse join(String username, String password) {
 
-        userRepository.findById(id).ifPresent(it -> {
-            throw new PostApplicationException(ErrorCode.DUPLICATED_USER_ID, String.format("%s is duplicated", id));
+        userRepository.findByUsername(username).ifPresent(it -> {
+            throw new PostApplicationException(ErrorCode.DUPLICATED_USER_ID, String.format("%s is duplicated", username));
         });
 
         User user = new User();
-        user.setId(id);
+        user.setUsername(username);
         user.setPassword(encoder.encode(password));
         userRepository.save(user);
 
-        return new UserJoinResponse(user.getId(), user.getRole());
+        return new UserJoinResponse(user.getId(), user.getUsername(), user.getRole());
     }
 
     @Transactional
-    public LoginResponse login(String id, String password) {
+    public LoginResponse login(String username, String password) {
         // user 정보 없을 때 exception
-        User user = userRepository.findById(id).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s is not exists", id)));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s is not exists", username)));
 
         // 비밀번호 틀릴 때 exception
         if(!encoder.matches(password, user.getPassword())) {
@@ -64,30 +64,30 @@ public class UserService {
         }
 
         // 토큰 생성
-        String token = JwtTokenUtils.generateToken(id, user.getRole().name(), secretKey, expiredTimeMs);
+        String token = JwtTokenUtils.generateToken(username, user.getRole().name(), secretKey, expiredTimeMs);
 
 //        return new LoginResponse(user.getId(), user.getRole(), token);
         return new LoginResponse(token);
     }
 
     @Transactional
-    public UserInfoResponse getUserInfo(String id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s is not exists", id)));
+    public UserInfoResponse getUserInfo(String username) {
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s is not exists", username)));
 
-        return new UserInfoResponse(user.getId(), user.getRole());
+        return new UserInfoResponse(user.getUsername(), user.getRole());
     }
 
 
     @Transactional
-    public UserDeleteResponse deleteUser(String id, String password) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s is not exists", id)));
+    public UserDeleteResponse deleteUser(String username, String password) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s is not exists", username)));
 
         if(!encoder.matches(password, user.getPassword()))
             throw new PostApplicationException(ErrorCode.INCORRECT_PASSWORD, "Please check your password and try again.");
 
-        userRepository.deleteUserFromDB(id);
-        return new UserDeleteResponse(id);
+        userRepository.deleteUserFromDB(username);
+        return new UserDeleteResponse(username);
     }
 
     public Page<AlarmDTO> alarmList(Pageable pageable, String userId) {

@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AlarmArgs {
-    private String fromUserId;
+    private Integer fromUserId;
     private Long targetId;
 }

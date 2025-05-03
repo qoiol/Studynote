@@ -9,12 +9,12 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserInfoResponse {
-    private String id;
+    private String username;
     private UserRole role;
 
     public static UserInfoResponse fromUserDTO(UserDTO user) {
         return UserInfoResponse.builder()
-                .id(user.getId())
+                .username(user.getUsername())
                 .role(user.getRole())
                 .build();
     }

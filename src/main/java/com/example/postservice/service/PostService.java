@@ -27,9 +27,9 @@ public class PostService {
     private final AlarmRepository alarmRepository;
 
     @Transactional
-    public void create(String title, String content, String userId) {
+    public void create(String title, String content, String username) {
         // user 검증
-        User user = userRepository.findById(userId).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND));
         //등록
         postRepository.save(Post.builder().title(title).content(content).user(user).build());
     }
@@ -37,7 +37,7 @@ public class PostService {
     @Transactional
     public void update(Long id, String title, String content, String name) {
         //user 검증
-        User user = userRepository.findById(name).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findByUsername(name).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND));
         //post 검증
         Post post = postRepository.findById(id).orElseThrow(() -> new PostApplicationException(ErrorCode.POST_NOT_FOUND));
         //post 작성자 검증
@@ -53,7 +53,7 @@ public class PostService {
     @Transactional
     public void delete(Long id, String name) {
         //user 검증
-        User user = userRepository.findById(name).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findByUsername(name).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND));
         //post 검증
         Post post = postRepository.findById(id).orElseThrow(() -> new PostApplicationException(ErrorCode.POST_NOT_FOUND));
         //post 작성자 검증
@@ -69,14 +69,14 @@ public class PostService {
     @Transactional
     public Page<PostDTO> my(Pageable pageable, String userId) {
         // user 검증
-        User user = userRepository.findById(userId).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findByUsername(userId).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND));
         return postRepository.findAllByUser(user, pageable).map(PostDTO::fromPost);
     }
 
     @Transactional
     public void addLike(Long id, String name) {
         // user 검증
-        User user = userRepository.findById(name).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findByUsername(name).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND));
         // post 검증
         Post post = postRepository.findById(id).orElseThrow(() -> new PostApplicationException(ErrorCode.POST_NOT_FOUND));
         // 좋아요 눌렀는지 검증
@@ -106,7 +106,7 @@ public class PostService {
     @Transactional
     public void addComment(Long id, String comment, String name) {
         // user 검증
-        User user = userRepository.findById(name).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findByUsername(name).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND));
         // post 검증
         Post post = postRepository.findById(id).orElseThrow(() -> new PostApplicationException(ErrorCode.POST_NOT_FOUND));
         // 댓글 등록
