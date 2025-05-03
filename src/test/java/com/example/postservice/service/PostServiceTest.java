@@ -34,9 +34,9 @@ public class PostServiceTest {
         String title = "수정 제목";
         String content = "수정 내용";
 
-        String userid = "user1";
+        Integer userid = 1;
 
-        when(userRepository.findById(userid)).thenReturn(Optional.empty());
+        when(userRepository.findById(1)).thenReturn(Optional.empty());
         when(postRepository.findById(any())).thenReturn(mock(Optional.class));
         when(postRepository.save(any())).thenReturn(mock(Post.class));
 
@@ -48,28 +48,28 @@ public class PostServiceTest {
 
     @Test
     void 포스트_삭제_실패() {
-        String userid = "user";
+        Integer userid = 1;
         Long postid = 1L;
 
         // 유저 정보 X
-        when(userRepository.findById(userid)).thenReturn(Optional.empty());
+        when(userRepository.findById(any())).thenReturn(Optional.empty());
 
         PostApplicationException e1 = Assertions.assertThrows(PostApplicationException.class, () -> postService.delete(postid, userid));
         Assertions.assertEquals(e1.getErrorCode(), ErrorCode.USER_NOT_FOUND);
 
         // post 정보 X
-        when(userRepository.findById(userid)).thenReturn(Optional.of(mock(User.class)));
+        when(userRepository.findById(any())).thenReturn(Optional.of(mock(User.class)));
         when(postRepository.findById(any())).thenReturn(Optional.empty());
 
         PostApplicationException e2 = Assertions.assertThrows(PostApplicationException.class, () -> postService.delete(postid, userid));
         Assertions.assertEquals(e2.getErrorCode(), ErrorCode.POST_NOT_FOUND);
 
         // post 작성자 불일치
-        User user1 = UserFixture.get("test", "1234");
-        User user2 = UserFixture.get("user", "1234");
+        User user1 = UserFixture.get(1, "test", "1234");
+        User user2 = UserFixture.get(2, "user", "1234");
         Post post = PostFixture.get(postid, user1);
 
-        when(userRepository.findById(userid)).thenReturn(Optional.of(user2));
+        when(userRepository.findById(2)).thenReturn(Optional.of(user2));
         when(postRepository.findById(any())).thenReturn(Optional.of(post));
 
         PostApplicationException e3 = Assertions.assertThrows(PostApplicationException.class, () -> postService.delete(postid, userid));
@@ -78,16 +78,17 @@ public class PostServiceTest {
 
     @Test
     void 포스트_삭제_성공() {
-        String userid = "user";
+        Integer userId = 1;
+        String username = "user";
         Long postid = 1L;
-        // post 작성자 불일치
-        User user = UserFixture.get(userid, "1234");
+
+        User user = UserFixture.get(userId, username, "1234");
         Post post = PostFixture.get(postid, user);
 
 
-        when(userRepository.findById(userid)).thenReturn(Optional.of(user));
+        when(userRepository.findById(any())).thenReturn(Optional.of(user));
         when(postRepository.findById(postid)).thenReturn(Optional.of(post));
 
-        Assertions.assertDoesNotThrow(() -> postService.delete(postid, userid));
+        Assertions.assertDoesNotThrow(() -> postService.delete(postid, userId));
     }
 }

@@ -3,12 +3,16 @@ package com.example.postservice.controller;
 
 import com.example.postservice.controller.response.CommentResponse;
 import com.example.postservice.controller.response.PostResponse;
+import com.example.postservice.exception.ErrorCode;
+import com.example.postservice.exception.PostApplicationException;
 import com.example.postservice.model.dto.CommentDTO;
 import com.example.postservice.model.dto.PostDTO;
 import com.example.postservice.controller.request.CommentRegistRequest;
 import com.example.postservice.controller.request.PostCreateRequest;
 import com.example.postservice.controller.response.Response;
+import com.example.postservice.model.dto.UserDTO;
 import com.example.postservice.service.PostService;
+import com.example.postservice.util.ClassUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -25,7 +29,9 @@ public class PostController {
 
     @PostMapping
     public Response<Void> create(@RequestBody PostCreateRequest request, Authentication authentication) {
-        postService.create(request.getTitle(), request.getBody(), authentication.getName());
+        UserDTO user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), UserDTO.class)
+                .orElseThrow(() -> new PostApplicationException(ErrorCode.INTERNAL_SERVER_ERROR, "Casting to User class failed"));
+        postService.create(request.getTitle(), request.getBody(), user.getId());
 
 //        log.error("postcreate authentication {}, {}", authentication.getName(), authentication.getAuthorities());
         return Response.success();
@@ -33,13 +39,17 @@ public class PostController {
 
     @PutMapping("/{id}")
     public Response<Void> update(@RequestBody PostCreateRequest request, @PathVariable Long id, Authentication authentication) {
-        postService.update(id, request.getTitle(), request.getBody(), authentication.getName());
+        UserDTO user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), UserDTO.class)
+                .orElseThrow(() -> new PostApplicationException(ErrorCode.INTERNAL_SERVER_ERROR));
+        postService.update(id, request.getTitle(), request.getBody(), user.getId());
         return Response.success();
     }
 
     @DeleteMapping("/{id}")
     public Response<Void> delete(@PathVariable Long id, Authentication authentication) {
-        postService.delete(id, authentication.getName());
+        UserDTO user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), UserDTO.class)
+                .orElseThrow(() -> new PostApplicationException(ErrorCode.INTERNAL_SERVER_ERROR));
+        postService.delete(id, user.getId());
         return Response.success();
     }
 
@@ -50,7 +60,9 @@ public class PostController {
 
     @GetMapping("/my")
     public Response<Page<PostResponse>> my(Pageable pageable, Authentication authentication) {
-        return Response.success(postService.my(pageable, authentication.getName()).map(PostResponse::fromPost));
+        UserDTO user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), UserDTO.class)
+                .orElseThrow(() -> new PostApplicationException(ErrorCode.INTERNAL_SERVER_ERROR));
+        return Response.success(postService.my(pageable, user.getId()).map(PostResponse::fromPost));
     }
 
     @GetMapping("/{id}/likes")
@@ -60,7 +72,9 @@ public class PostController {
 
     @PostMapping("/{id}/likes")
     public Response<Void> like(@PathVariable Long id, Authentication authentication) {
-        postService.addLike(id, authentication.getName());
+        UserDTO user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), UserDTO.class)
+                        .orElseThrow(() -> new PostApplicationException(ErrorCode.INTERNAL_SERVER_ERROR, "Casting to User class failed"));
+        postService.addLike(id, user.getId());
         return Response.success();
     }
 
@@ -71,7 +85,9 @@ public class PostController {
 
     @PostMapping("/{id}/comments")
     public Response<Void> comment(@PathVariable Long id, @RequestBody CommentRegistRequest request, Authentication authentication) {
-        postService.addComment(id, request.getComment(), authentication.getName());
+        UserDTO user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), UserDTO.class)
+                .orElseThrow(() -> new PostApplicationException(ErrorCode.INTERNAL_SERVER_ERROR, "Casting to User class failed"));
+        postService.addComment(id, request.getComment(), user.getId());
         return Response.success();
     }
 }
