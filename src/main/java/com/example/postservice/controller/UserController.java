@@ -2,11 +2,16 @@ package com.example.postservice.controller;
 
 
 import com.example.postservice.controller.response.*;
+import com.example.postservice.exception.ErrorCode;
+import com.example.postservice.exception.PostApplicationException;
 import com.example.postservice.model.dto.AlarmDTO;
 import com.example.postservice.controller.request.UserDeleteRequest;
 import com.example.postservice.controller.request.UserJoinRequest;
 import com.example.postservice.controller.request.LoginRequest;
+import com.example.postservice.model.dto.UserDTO;
+import com.example.postservice.model.entity.User;
 import com.example.postservice.service.UserService;
+import com.example.postservice.util.ClassUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +48,9 @@ public class UserController {
 
     @GetMapping("/alarm")
     public Response<Page<AlarmResponse>> alarm(Pageable pageable, Authentication authentication) {
-        return Response.success(userService.alarmList(pageable, authentication.getName()).map(AlarmResponse::fromAlarmDTO));
+        UserDTO user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), UserDTO.class)
+                .orElseThrow(() -> new PostApplicationException(ErrorCode.INTERNAL_SERVER_ERROR, "Casting to User class failed"));
+        return Response.success(userService.alarmList(pageable, user.getId()).map(AlarmResponse::fromAlarmDTO));
     }
 
 }
