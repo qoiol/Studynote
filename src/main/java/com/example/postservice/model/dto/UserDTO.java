@@ -19,6 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDTO implements UserDetails {
+    private Integer id;
     private String username;
     private String password;
     private UserRole role;
@@ -28,6 +29,7 @@ public class UserDTO implements UserDetails {
 
     public static UserDTO fromUser(User user) {
         UserDTO userDTO = new UserDTO();
+        userDTO.setId(user.getId());
         userDTO.setUsername(user.getUsername());
         userDTO.setPassword(user.getPassword());
         userDTO.setRole(user.getRole());
