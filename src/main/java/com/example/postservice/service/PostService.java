@@ -95,7 +95,7 @@ public class PostService {
 
     }
 
-    public Integer countLike(Long id) {
+    public long countLike(Long id) {
         //post 검증
         Post post = postRepository.findById(id).orElseThrow(() -> new PostApplicationException(ErrorCode.POST_NOT_FOUND));
 
