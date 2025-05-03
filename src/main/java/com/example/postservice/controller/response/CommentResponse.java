@@ -1,7 +1,6 @@
 package com.example.postservice.controller.response;
 
 import com.example.postservice.model.dto.CommentDTO;
-import com.example.postservice.model.entity.Comment;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,7 +14,7 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 public class CommentResponse {
     private Long id;
-    private String userName;
+    private String username;
     private Long postId;
     private String comment;
     private Timestamp registeredAt;
@@ -25,7 +24,7 @@ public class CommentResponse {
     public static CommentResponse fromComment(CommentDTO comment) {
         return CommentResponse.builder()
                 .id(comment.getId())
-                .userName(comment.getUser().getId())
+                .username(comment.getUser().getUsername())
                 .comment(comment.getComment())
                 .registeredAt(comment.getRegisteredAt())
                 .updatedAt(comment.getUpdatedAt())

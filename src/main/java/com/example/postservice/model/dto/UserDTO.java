@@ -19,7 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDTO implements UserDetails {
-    private String id;
+    private String username;
     private String password;
     private UserRole role;
     private Timestamp registeredAt;
@@ -28,7 +28,7 @@ public class UserDTO implements UserDetails {
 
     public static UserDTO fromUser(User user) {
         UserDTO userDTO = new UserDTO();
-        userDTO.setId(user.getId());
+        userDTO.setUsername(user.getUsername());
         userDTO.setPassword(user.getPassword());
         userDTO.setRole(user.getRole());
         userDTO.setRegisteredAt(user.getRegisteredAt());
@@ -44,7 +44,7 @@ public class UserDTO implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.id;
+        return this.username;
     }
 
     @Override
