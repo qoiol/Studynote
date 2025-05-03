@@ -90,8 +90,9 @@ public class UserService {
         return new UserDeleteResponse(id);
     }
 
-    public Page<AlarmDTO> alarmList(Pageable pageable, String name) {
-        User user = userRepository.findById(name).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND, String.format("user %s not found", name)));
-        return alarmRepository.findByUser(pageable, user).map(AlarmDTO::fromAlarm);
+    public Page<AlarmDTO> alarmList(Pageable pageable, String userId) {
+//        User user = userRepository.findById(userId).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND, String.format("user %s not found", userId)));
+//        return alarmRepository.findByUser(pageable, user).map(AlarmDTO::fromAlarm);
+        return alarmRepository.findByUserId(pageable, userId).map(AlarmDTO::fromAlarm);
     }
 }

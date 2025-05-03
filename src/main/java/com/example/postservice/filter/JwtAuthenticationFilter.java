@@ -34,21 +34,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final String key;
     private final UserService userService;
 
-
-    @Value("${jwt.expired-time-ms}")
-    private long expiredTimeMs;
-
-    private final Set<String> uri = Set.of(
-            "/user/login", "/user/join", "/user/logout", "/");
-    private final Set<String> prefix = Set.of(
-            "/favicon.",
-            "/css/",
-            "/js/",
-            "/images/",
-            "/webjars/",
-            "/"
-    );
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
@@ -88,29 +73,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
 
-    }
-
-    //쿠키 가져오기
-    private Cookie getToken(String name, HttpServletRequest request) {
-        return Arrays.stream(request.getCookies())
-                .filter(cookie -> cookie.getName().equals(name))
-                .findAny()
-                .orElse(null);
-    }
-
-
-    //로그인페이지로 이동
-    private void moveToLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String uri = request.getRequestURI();
-        String queryString = request.getQueryString() != null ? request.getQueryString() : "";
-        String referer = URLEncoder.encode(URLEncoder.encode(uri + queryString, StandardCharsets.UTF_8), StandardCharsets.UTF_8);
-
-        response.setContentType("text/html;charset=utf-8");
-        response.getWriter().append("<script>alert('로그인 후 다시 시도해주세요.');location.href='/user/login?referer=").append(referer).append("';</script>");
-    }
-
-    //로그인 여부 반환
-    private boolean loginFlag(HttpSession session) {
-        return (session.getAttribute("userId") != null && session.getAttribute("userType") != null);
     }
 }
