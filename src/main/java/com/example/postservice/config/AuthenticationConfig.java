@@ -29,15 +29,22 @@ public class AuthenticationConfig {
     private final UserService userService;
 
     @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring()
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
+                .requestMatchers(new RegexRequestMatcher("^(?!/api/).*", "GET"))
+                .requestMatchers("/api/*/users/join", "/api/*/users/login")
+                ;
+    }
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http.formLogin(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
-                        auth
-                                .requestMatchers("/api/*/users/join", "/api/*/users/login").permitAll()
-                                .requestMatchers("/api/**").authenticated()
+                        auth.requestMatchers("/api/**").authenticated()
                                 .anyRequest().permitAll()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(secretKey, userService), UsernamePasswordAuthenticationFilter.class)
@@ -45,13 +52,5 @@ public class AuthenticationConfig {
                     e.authenticationEntryPoint(new CustomAuthenticationEntryPoint());
                 })
                 .build();
-    }
-
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring()
-                .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
-                .requestMatchers(new RegexRequestMatcher("^(?!/api/).*", "GET"))
-                ;
     }
 }
