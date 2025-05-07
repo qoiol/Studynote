@@ -10,6 +10,7 @@ import com.example.postservice.controller.response.LoginResponse;
 import com.example.postservice.exception.ErrorCode;
 import com.example.postservice.exception.PostApplicationException;
 import com.example.postservice.repository.AlarmRepository;
+import com.example.postservice.repository.UserCacheRepository;
 import com.example.postservice.repository.UserRepository;
 import com.example.postservice.util.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
     private final UserRepository userRepository;
     private final AlarmRepository alarmRepository;
+    private final UserCacheRepository userCacheRepository;
     private final BCryptPasswordEncoder encoder;
 
     @Value("${jwt.secret-key}")
@@ -35,7 +37,10 @@ public class UserService {
     private long expiredTimeMs;
 
     public UserDTO loadUserById(String username) {
-        return userRepository.findByUsername(username).map(UserDTO::fromUser).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s is not found", username)));
+        return userCacheRepository.getUser(username).orElseGet(() ->
+                userRepository.findByUsername(username).map(UserDTO::fromUser).orElseThrow(() ->
+                        new PostApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s is not found", username)))
+        );
     }
 
     @Transactional
@@ -56,7 +61,12 @@ public class UserService {
     @Transactional
     public LoginResponse login(String username, String password) {
         // user 정보 없을 때 exception
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s is not exists", username)));
+//        User user = userRepository.findByUsername(username).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s is not exists", username)));
+        // -> 캐시 먼저 검색 -> db
+        UserDTO user = loadUserById(username);
+
+        // redis 캐싱
+        userCacheRepository.setUser(user);
 
         // 비밀번호 틀릴 때 exception
         if(!encoder.matches(password, user.getPassword())) {
@@ -66,7 +76,6 @@ public class UserService {
         // 토큰 생성
         String token = JwtTokenUtils.generateToken(username, user.getRole().name(), secretKey, expiredTimeMs);
 
-//        return new LoginResponse(user.getId(), user.getRole(), token);
         return new LoginResponse(token);
     }
 
