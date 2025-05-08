@@ -8,6 +8,7 @@ import com.example.postservice.controller.request.UserDeleteRequest;
 import com.example.postservice.controller.request.UserJoinRequest;
 import com.example.postservice.controller.request.LoginRequest;
 import com.example.postservice.model.dto.UserDTO;
+import com.example.postservice.service.AlarmService;
 import com.example.postservice.service.UserService;
 import com.example.postservice.util.ClassUtils;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Log4j2
 @RestController
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/users")
 public class UserController {
     private final UserService userService;
+    private final AlarmService alarmService;
 
     @PostMapping("/join")
     public Response<UserJoinResponse> join(@RequestBody @Valid UserJoinRequest request) {
@@ -49,6 +52,13 @@ public class UserController {
         UserDTO user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), UserDTO.class)
                 .orElseThrow(() -> new PostApplicationException(ErrorCode.INTERNAL_SERVER_ERROR, "Casting to User class failed"));
         return Response.success(userService.alarmList(pageable, user.getId()).map(AlarmResponse::fromAlarmDTO));
+    }
+
+    @GetMapping("/alarm/subscribe")
+    public SseEmitter subsrcibe(Authentication authentication) {
+        UserDTO user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), UserDTO.class)
+                .orElseThrow(() -> new PostApplicationException(ErrorCode.INTERNAL_SERVER_ERROR, "Casting to User class failed"));
+        return alarmService.connectAlarm(user.getId());
     }
 
 }

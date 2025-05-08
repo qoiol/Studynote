@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -34,18 +35,34 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final String key;
     private final UserService userService;
 
+    private final static List<String> TOKEN_IN_PARAM_URLS = List.of("/api/v1/users/alarm/subscribe");
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if(header == null || !header.startsWith("Bearer")) {
-            log.error("Error occurs while getting header. header is null or invalid. request uri : {}", request.getRequestURI());
-            filterChain.doFilter(request, response);
-            return;
-        }
+        final String token;
+
+
+
 
         try {
-            final String token = header.split(" ")[1].trim();
+            if(TOKEN_IN_PARAM_URLS.contains(request.getRequestURI())) {
+                log.info("Request with {} check the query param", request.getRequestURI());
+                token = request.getParameter("token");
+                if(token == null) {
+                    log.error("Error occurs while getting param. param is null or invalid. request uri : {}", request.getRequestURI());
+                    filterChain.doFilter(request, response);
+                    return;
+                }
+            } else {
+                final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+                if(header == null || !header.startsWith("Bearer")) {
+                    log.error("Error occurs while getting header. header is null or invalid. request uri : {}", request.getRequestURI());
+                    filterChain.doFilter(request, response);
+                    return;
+                }
+                token = header.split(" ")[1].trim();
+            }
 
             // 만료 기간 검증
             if(JwtTokenUtils.isExpired(token, key)) {
