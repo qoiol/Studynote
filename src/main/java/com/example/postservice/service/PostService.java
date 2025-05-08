@@ -27,6 +27,7 @@ public class PostService {
     private final LikeRepository likeRepository;
     private final CommentRepository commentRepository;
     private final AlarmRepository alarmRepository;
+    private final AlarmService alarmService;
 
     @Transactional
     public void create(String title, String content, Integer userId) {
@@ -83,14 +84,15 @@ public class PostService {
         });
         // 저장
         likeRepository.save(Like.builder().post(post).user(User.builder().id(userId).build()).build());
+
         // 알람 발생
-        alarmRepository.save(Alarm.builder()
+        Alarm alarm = alarmRepository.save(Alarm.builder()
                 .alarmType(AlarmType.NEW_LIKE_ON_POST)
                 .args(new AlarmArgs(userId, post.getId()))
                 .user(post.getUser())
                 .build()
         );
-
+        alarmService.send(alarm.getId(), post.getUser().getId());
     }
 
     public long countLike(Long id) {
@@ -107,13 +109,15 @@ public class PostService {
         Post post = postRepository.findById(id).orElseThrow(() -> new PostApplicationException(ErrorCode.POST_NOT_FOUND));
         // 댓글 등록
         commentRepository.save(Comment.builder().comment(comment).user(User.builder().id(userId).build()).post(post).build());
+
         // 알람 발생
-        alarmRepository.save(Alarm.builder()
+        Alarm alarm = alarmRepository.save(Alarm.builder()
                 .alarmType(AlarmType.NEW_COMMENT_ON_POST)
                 .args(new AlarmArgs(userId, post.getId()))
                 .user(post.getUser())
                 .build()
         );
+        alarmService.send(alarm.getId(), post.getUser().getId());
     }
 
     public Page<CommentDTO> commentList(Pageable pageable, Long id) {
