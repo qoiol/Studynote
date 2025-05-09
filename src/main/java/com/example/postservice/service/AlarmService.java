@@ -2,7 +2,14 @@ package com.example.postservice.service;
 
 import com.example.postservice.exception.ErrorCode;
 import com.example.postservice.exception.PostApplicationException;
+import com.example.postservice.model.AlarmArgs;
+import com.example.postservice.model.AlarmType;
+import com.example.postservice.model.entity.Alarm;
+import com.example.postservice.model.entity.User;
+import com.example.postservice.model.event.AlarmEvent;
+import com.example.postservice.repository.AlarmRepository;
 import com.example.postservice.repository.EmitterRepository;
+import com.example.postservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.web.embedded.TomcatVirtualThreadsWebServerFactoryCustomizer;
@@ -20,14 +27,27 @@ public class AlarmService {
     private final static String ALARM_NAME = "alarm";
 
     private final EmitterRepository emitterRepository;
+    private final AlarmRepository alarmRepository;
+    private final UserRepository userRepository;
 
-    public void send(Long alarmId, Integer userId) {
-        emitterRepository.get(userId).ifPresentOrElse(
+    public void send(AlarmType type, AlarmArgs args, Integer receiveUserId) {
+
+        User user = userRepository.findById(receiveUserId).orElseThrow(() -> new PostApplicationException(ErrorCode.USER_NOT_FOUND));
+
+        // alarm save
+        Alarm alarm = alarmRepository.save(Alarm.builder()
+                .alarmType(type)
+                .args(args)
+                .user(user)
+                .build()
+        );
+
+        emitterRepository.get(user.getId()).ifPresentOrElse(
                 sseEmitter -> {
                     try {
-                        sseEmitter.send(SseEmitter.event().id(alarmId.toString()).name(ALARM_NAME).data("new alarm"));
+                        sseEmitter.send(SseEmitter.event().id(alarm.getId().toString()).name(ALARM_NAME).data("new alarm"));
                     } catch (IOException e) {
-                        emitterRepository.delete(userId);
+                        emitterRepository.delete(user.getId());
                         throw new PostApplicationException(ErrorCode.NOTIFICATION_CONNECT_ERROR);
                     }
                 }

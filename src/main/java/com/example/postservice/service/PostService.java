@@ -8,6 +8,8 @@ import com.example.postservice.model.dto.CommentDTO;
 import com.example.postservice.model.dto.PostDTO;
 import com.example.postservice.exception.ErrorCode;
 import com.example.postservice.exception.PostApplicationException;
+import com.example.postservice.model.event.AlarmEvent;
+import com.example.postservice.producer.AlarmProducer;
 import com.example.postservice.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -28,6 +30,7 @@ public class PostService {
     private final CommentRepository commentRepository;
     private final AlarmRepository alarmRepository;
     private final AlarmService alarmService;
+    private final AlarmProducer alarmProducer;
 
     @Transactional
     public void create(String title, String content, Integer userId) {
@@ -86,13 +89,13 @@ public class PostService {
         likeRepository.save(Like.builder().post(post).user(User.builder().id(userId).build()).build());
 
         // 알람 발생
-        Alarm alarm = alarmRepository.save(Alarm.builder()
-                .alarmType(AlarmType.NEW_LIKE_ON_POST)
-                .args(new AlarmArgs(userId, post.getId()))
-                .user(post.getUser())
-                .build()
+        alarmProducer.send(
+                new AlarmEvent(
+                        post.getUser().getId()
+                        , AlarmType.NEW_LIKE_ON_POST
+                        , new AlarmArgs(userId, post.getId())
+                )
         );
-        alarmService.send(alarm.getId(), post.getUser().getId());
     }
 
     public long countLike(Long id) {
@@ -111,13 +114,13 @@ public class PostService {
         commentRepository.save(Comment.builder().comment(comment).user(User.builder().id(userId).build()).post(post).build());
 
         // 알람 발생
-        Alarm alarm = alarmRepository.save(Alarm.builder()
-                .alarmType(AlarmType.NEW_COMMENT_ON_POST)
-                .args(new AlarmArgs(userId, post.getId()))
-                .user(post.getUser())
-                .build()
+        alarmProducer.send(
+                new AlarmEvent(
+                        post.getUser().getId()
+                        , AlarmType.NEW_COMMENT_ON_POST
+                        , new AlarmArgs(userId, post.getId())
+                )
         );
-        alarmService.send(alarm.getId(), post.getUser().getId());
     }
 
     public Page<CommentDTO> commentList(Pageable pageable, Long id) {
