@@ -2,7 +2,6 @@ package com.example.postservice.service;
 
 import com.example.postservice.model.AlarmArgs;
 import com.example.postservice.model.AlarmType;
-import com.example.postservice.model.dto.UserDTO;
 import com.example.postservice.model.entity.*;
 import com.example.postservice.model.dto.CommentDTO;
 import com.example.postservice.model.dto.PostDTO;
@@ -17,8 +16,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Objects;
 
 @Log4j2
 @Service

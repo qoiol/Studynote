@@ -1,6 +1,5 @@
 package com.example.postservice.controller;
 
-
 import com.example.postservice.controller.response.CommentResponse;
 import com.example.postservice.controller.response.PostResponse;
 import com.example.postservice.exception.ErrorCode;

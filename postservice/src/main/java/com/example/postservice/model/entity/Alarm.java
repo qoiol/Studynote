@@ -2,8 +2,6 @@ package com.example.postservice.model.entity;
 
 import com.example.postservice.model.AlarmArgs;
 import com.example.postservice.model.AlarmType;
-import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
-import com.vladmihalcea.hibernate.type.json.JsonBlobType;
 import com.vladmihalcea.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.*;

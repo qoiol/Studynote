@@ -6,13 +6,11 @@ import com.example.postservice.model.AlarmArgs;
 import com.example.postservice.model.AlarmType;
 import com.example.postservice.model.entity.Alarm;
 import com.example.postservice.model.entity.User;
-import com.example.postservice.model.event.AlarmEvent;
 import com.example.postservice.repository.AlarmRepository;
 import com.example.postservice.repository.EmitterRepository;
 import com.example.postservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.boot.autoconfigure.web.embedded.TomcatVirtualThreadsWebServerFactoryCustomizer;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 

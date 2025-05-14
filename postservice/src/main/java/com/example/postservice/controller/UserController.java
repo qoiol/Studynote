@@ -1,6 +1,5 @@
 package com.example.postservice.controller;
 
-
 import com.example.postservice.controller.response.*;
 import com.example.postservice.exception.ErrorCode;
 import com.example.postservice.exception.PostApplicationException;

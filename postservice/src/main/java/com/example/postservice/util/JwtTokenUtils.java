@@ -3,7 +3,6 @@ package com.example.postservice.util;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -28,8 +27,6 @@ public class JwtTokenUtils {
     }
 
     private static Claims extractClaims(String token, String key) throws ExpiredJwtException {
-//        return Jwts.parser().setSigningKey(getKey(key)).setAllowedClockSkewSeconds(1)
-//                .build().parseClaimsJws(token).getBody();
         return Jwts.parser().clockSkewSeconds(1)
                 .verifyWith(getKey(key))
                 .decryptWith(getKey(key))
@@ -54,12 +51,6 @@ public class JwtTokenUtils {
         byte[] bytes = key.getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(bytes);
     }
-
-//    public static SecretKey getSecretKey(String key) {
-//        byte[] bytes = key.getBytes(StandardCharsets.UTF_8);
-//        return Keys.hmacShaKeyFor(bytes);
-//    }
-
 
     public static Cookie addCookie(String name, String value, HttpServletResponse response) {
         Cookie cookie = new Cookie(name, value);

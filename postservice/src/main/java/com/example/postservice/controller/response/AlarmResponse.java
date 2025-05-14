@@ -3,8 +3,6 @@ package com.example.postservice.controller.response;
 import com.example.postservice.model.AlarmArgs;
 import com.example.postservice.model.AlarmType;
 import com.example.postservice.model.dto.AlarmDTO;
-import com.example.postservice.model.dto.UserDTO;
-import com.example.postservice.model.entity.Alarm;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

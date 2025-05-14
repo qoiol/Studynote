@@ -1,7 +1,6 @@
 package com.example.postservice.consumer;
 
 import com.example.postservice.model.event.AlarmEvent;
-import com.example.postservice.producer.AlarmProducer;
 import com.example.postservice.service.AlarmService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;

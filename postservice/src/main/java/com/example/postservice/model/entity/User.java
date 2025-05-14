@@ -1,7 +1,6 @@
 package com.example.postservice.model.entity;
 
 import com.example.postservice.model.UserRole;
-import com.example.postservice.model.dto.UserDTO;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
