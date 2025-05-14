@@ -1,0 +1,119 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.4.4'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'com.github.node-gradle.node' version '3.3.0'
+//    id 'com.google.cloud.tools.jib' version '3.2.0'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+//
+//jib {
+//    from {
+//        image = 'openjdk:17-jre-slim'
+//    }
+//    to {
+//        image = 'spring-post'
+//        tags = ['0.0.1']
+//    }
+//    container {
+//        mainClass = 'com.example.postservice.PostserviceApplication'
+//        creationTime = 'USER_CURRENT_TIMESTAMP'
+//        format = 'OCI'
+//        volumes = ['/var/tmp']
+//        entrypoint = ['java'
+//        , '-cp', '/app/resources:/app/classes:/app/libs/*'
+//        , 'com.example.postservice.PostserviceApplication']
+//    }
+//}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4'
+
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation:3.4.4'
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+
+
+    //jwt
+    // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-jackson
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
+    // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-impl
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
+    // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-api
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+
+    //swagger
+    // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6'
+
+    // jpa json 타입
+    // https://mvnrepository.com/artifact/com.vladmihalcea/hibernate-types-60
+    implementation 'com.vladmihalcea:hibernate-types-60:2.21.1'
+
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // https://mvnrepository.com/artifact/org.springframework.kafka/spring-kafka
+    implementation 'org.springframework.kafka:spring-kafka'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+node {
+    nodeModulesDir = file("$projectDir/front-end")
+    version = '18.3.0'
+    download = true
+}
+
+tasks.register('npmBuild', NpmTask) {
+    args = ['run', "build"]
+}
+
+tasks.register('copyFrontEnd', Copy) {
+    from "$projectDir/front-end/static"
+    into 'build/resources/main/static/.'
+}
+
+tasks.register('cleanFrontEnd', Delete) {
+    delete "$projectDir/front-end/static", "$projectDir/front-end/node_modules"
+}
+
+//npmBuild.dependsOn npmInstall
+//copyFrontEnd.dependsOn npmBuild
+//compileJava.dependsOn copyFrontEnd
+//
+//clean.dependsOn cleanFrontEnd
