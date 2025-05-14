@@ -18,7 +18,10 @@ public class AlarmConsumer {
 
     @KafkaListener(topics = "${spring.kafka.topic.alarm}")
     public void consumeAlarm(AlarmEvent event, Acknowledgment ack) {
+
         log.info("Consume the event {}", event);
         alarmService.send(event.getAlarmType(), event.getAlarmArgs(), event.getReceiveUserId());
+
+        ack.acknowledge();
     }
 }
